@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Study Group Matching System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tab-btn.active { @apply bg-indigo-600 text-white; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+<!-- Header -->
+<header class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow">
+  <div>
+    <h1 class="text-xl font-bold">Smart Study Group Matching System</h1>
+    <p class="text-indigo-200 text-sm">SWE3020 — Live Demo</p>
+  </div>
+  <form method="post" action="/demo/reset">
+    <button class="bg-indigo-500 hover:bg-indigo-400 text-sm px-3 py-1 rounded">
+      Reset Demo Data
+    </button>
+  </form>
+</header>
+
+<!-- Flash message -->
+{% if msg %}
+<div class="bg-green-100 border border-green-300 text-green-800 text-sm px-6 py-2">
+  {{ msg.replace("+", " ") }}
+</div>
+{% endif %}
+
+<!-- Tabs -->
+<div class="flex gap-1 px-6 pt-4">
+  {% for tab in ["Students", "Match", "Sessions", "Schedule", "Reports"] %}
+  <button onclick="showTab('{{ tab.lower() }}')"
+          id="tab-{{ tab.lower() }}"
+          class="tab-btn px-4 py-2 rounded-t text-sm font-medium bg-white border border-b-0 border-gray-300 hover:bg-indigo-50">
+    {{ tab }}
+  </button>
+  {% endfor %}
+</div>
+
+<main class="px-6 pb-10">
+
+<!-- ── STUDENTS ─────────────────────────────────────────────────────────── -->
+<div id="panel-students" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
+  <div class="flex gap-8">
+
+    <!-- Add student form -->
+    <div class="w-80 shrink-0">
+      <h2 class="font-semibold text-lg mb-3">Add Student</h2>
+      <form method="post" action="/students/add" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-gray-600 mb-1">ID</label>
+          <input name="sid" required class="border rounded w-full px-2 py-1" placeholder="e.g. S9"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Name</label>
+          <input name="name" required class="border rounded w-full px-2 py-1" placeholder="Full name"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Courses <span class="text-gray-400">(comma-separated)</span></label>
+          <input name="courses" required class="border rounded w-full px-2 py-1" placeholder="COMP101, MATH201"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Weak Topics <span class="text-gray-400">(optional)</span></label>
+          <input name="weak" class="border rounded w-full px-2 py-1" placeholder="Recursion, Graphs"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Available Slots <span class="text-gray-400">(DAY-HH:MM)</span></label>
+          <input name="slots" required class="border rounded w-full px-2 py-1" placeholder="MON-09:00, FRI-10:00"/>
+        </div>
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+          Add Student
+        </button>
+      </form>
+    </div>
+
+    <!-- Student list -->
+    <div class="flex-1 overflow-auto">
+      <h2 class="font-semibold text-lg mb-3">All Students ({{ students|length }})</h2>
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="px-3 py-2 border">ID</th>
+            <th class="px-3 py-2 border">Name</th>
+            <th class="px-3 py-2 border">Courses</th>
+            <th class="px-3 py-2 border">Weak Topics</th>
+            <th class="px-3 py-2 border">Available Slots</th>
+            <th class="px-3 py-2 border"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-3 py-1.5 border font-mono text-indigo-700">{{ s.id }}</td>
+            <td class="px-3 py-1.5 border font-medium">{{ s.name }}</td>
+            <td class="px-3 py-1.5 border text-gray-600">{{ s.courses | join(", ") }}</td>
+            <td class="px-3 py-1.5 border text-gray-500">{{ s.weak_topics | join(", ") or "—" }}</td>
+            <td class="px-3 py-1.5 border text-gray-500">{{ s.available_slots | join(", ") }}</td>
+            <td class="px-3 py-1.5 border text-center">
+              <form method="post" action="/students/delete" class="inline">
+                <input type="hidden" name="sid" value="{{ s.id }}"/>
+                <button class="text-red-500 hover:text-red-700 text-xs">remove</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="px-3 py-4 text-gray-400 text-center">No students yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── MATCH ────────────────────────────────────────────────────────────── -->
+<div id="panel-match" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
+  <div class="flex gap-8">
+
+    <div class="w-80 shrink-0">
+      <h2 class="font-semibold text-lg mb-3">Run Matching</h2>
+      <form method="post" action="/match" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-gray-600 mb-1">Course</label>
+          <input name="course" required class="border rounded w-full px-2 py-1" placeholder="COMP101"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Time Slot <span class="text-gray-400">(DAY-HH:MM)</span></label>
+          <input name="slot" required class="border rounded w-full px-2 py-1" placeholder="MON-09:00"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Group Size</label>
+          <input name="groupsize" type="number" min="2" max="5" value="3"
+                 class="border rounded w-full px-2 py-1"/>
+        </div>
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+          Match Students
+        </button>
+      </form>
+      <form method="post" action="/match/reset" class="mt-3">
+        <button class="w-full border border-red-400 text-red-500 hover:bg-red-50 rounded py-1.5 text-sm">
+          Clear All Groups & Sessions
+        </button>
+      </form>
+    </div>
+
+    <div class="flex-1">
+      <h2 class="font-semibold text-lg mb-3">Formed Groups ({{ groups|length }})</h2>
+      {% if groups %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for g in groups %}
+        <div class="border rounded p-4 bg-gray-50">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-mono font-bold text-indigo-700">{{ g.id }}</span>
+            <span class="text-xs bg-indigo-100 text-indigo-700 rounded px-2 py-0.5">{{ g.course }}</span>
+            <span class="text-xs text-gray-500">{{ g.time_slot }}</span>
+          </div>
+          <ul class="text-sm text-gray-700 space-y-0.5">
+            {% for m in g.members %}
+            <li>• {{ m.name }} <span class="text-gray-400">({{ m.id }})</span></li>
+            {% endfor %}
+          </ul>
+          <a href="/report/group/{{ g.id }}"
+             class="mt-2 block text-xs text-indigo-600 hover:underline text-right">
+            View report →
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-gray-400 text-sm">No groups formed yet. Run matching above.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ── SESSIONS ─────────────────────────────────────────────────────────── -->
+<div id="panel-sessions" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
+  <div class="flex gap-8">
+
+    <div class="w-80 shrink-0">
+      <h2 class="font-semibold text-lg mb-3">Record Session</h2>
+      <form method="post" action="/sessions/record" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-gray-600 mb-1">Group</label>
+          <select name="group_id" class="border rounded w-full px-2 py-1">
+            {% for g in groups %}
+            <option value="{{ g.id }}">{{ g.id }} — {{ g.course }} ({{ g.time_slot }})</option>
+            {% else %}
+            <option disabled>No groups yet</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Date</label>
+          <input name="date" type="date" required class="border rounded w-full px-2 py-1"
+                 value="2026-03-10"/>
+        </div>
+        <div>
+          <label class="block text-gray-600 mb-1">Attendee IDs <span class="text-gray-400">(comma-separated)</span></label>
+          <input name="attendee_ids" class="border rounded w-full px-2 py-1" placeholder="S1, S2"/>
+        </div>
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+          Record Session
+        </button>
+      </form>
+    </div>
+
+    <div class="flex-1">
+      <h2 class="font-semibold text-lg mb-3">Recorded Sessions ({{ sessions|length }})</h2>
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="px-3 py-2 border">ID</th>
+            <th class="px-3 py-2 border">Group</th>
+            <th class="px-3 py-2 border">Date</th>
+            <th class="px-3 py-2 border">Attendees</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ses in sessions %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-3 py-1.5 border font-mono text-indigo-700">{{ ses.id }}</td>
+            <td class="px-3 py-1.5 border">{{ ses.group.id }}</td>
+            <td class="px-3 py-1.5 border">{{ ses.date }}</td>
+            <td class="px-3 py-1.5 border text-gray-600">{{ ses.attendee_ids | join(", ") or "—" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="px-3 py-4 text-gray-400 text-center">No sessions recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCHEDULE ──────────────────────────────────────────────────────────── -->
+<div id="panel-schedule" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
+  <h2 class="font-semibold text-lg mb-4">Weekly Meeting Schedule</h2>
+  {% if schedule %}
+  {% set ns = namespace(current="") %}
+  {% for e in schedule %}
+    {% set header = e.day_label + " " + e.time %}
+    {% if header != ns.current %}
+      {% if ns.current %}</div>{% endif %}
+      <h3 class="font-medium text-indigo-700 mt-4 mb-2 border-b pb-1">{{ header }}</h3>
+      <div class="space-y-2">
+      {% set ns.current = header %}
+    {% endif %}
+    <div class="flex items-center gap-3 text-sm bg-gray-50 border rounded px-4 py-2">
+      <span class="font-mono font-bold text-indigo-600 w-16">{{ e.group_id }}</span>
+      <span class="bg-indigo-100 text-indigo-700 text-xs rounded px-2 py-0.5">{{ e.course }}</span>
+      <span class="text-gray-600">{{ e.member_ids | join(", ") }}</span>
+      <a href="/report/group/{{ e.group_id }}" class="ml-auto text-xs text-indigo-500 hover:underline">report →</a>
+    </div>
+  {% endfor %}
+  {% if schedule %}</div>{% endif %}
+  {% else %}
+  <p class="text-gray-400 text-sm">No groups scheduled. Run matching first.</p>
+  {% endif %}
+</div>
+
+<!-- ── REPORTS ───────────────────────────────────────────────────────────── -->
+<div id="panel-reports" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
+  <h2 class="font-semibold text-lg mb-4">Group Reports</h2>
+  {% if groups %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for g in groups %}
+    <a href="/report/group/{{ g.id }}"
+       class="block border rounded p-4 hover:border-indigo-400 hover:shadow-sm transition">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="font-mono font-bold text-indigo-700">{{ g.id }}</span>
+        <span class="text-xs bg-indigo-100 text-indigo-700 rounded px-2">{{ g.course }}</span>
+      </div>
+      <p class="text-sm text-gray-500">{{ g.time_slot }} · {{ g.members|length }} members</p>
+      <p class="text-xs text-indigo-500 mt-2">View attendance report →</p>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-gray-400 text-sm">No groups yet. Run matching first.</p>
+  {% endif %}
+</div>
+
+</main>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active','bg-indigo-600','text-white'));
+    document.getElementById('panel-' + name).classList.add('active');
+    const btn = document.getElementById('tab-' + name);
+    btn.classList.add('active','bg-indigo-600','text-white');
+  }
+  showTab('students');
+</script>
+</body>
+</html>

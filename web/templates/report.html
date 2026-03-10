@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Group Report — {{ group.id }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+<header class="bg-indigo-700 text-white px-6 py-4 shadow flex items-center gap-4">
+  <a href="/" class="text-indigo-200 hover:text-white text-sm">← Back</a>
+  <div>
+    <h1 class="text-xl font-bold">Attendance Report — {{ group.id }}</h1>
+    <p class="text-indigo-200 text-sm">{{ group.course }} · {{ group.time_slot }}</p>
+  </div>
+</header>
+
+<main class="px-6 py-8 max-w-3xl mx-auto">
+  <div class="bg-white border rounded-lg overflow-hidden shadow-sm">
+    <table class="w-full text-sm border-collapse">
+      <thead>
+        <tr class="bg-gray-100 text-left">
+          <th class="px-4 py-3 border-b">Student</th>
+          <th class="px-4 py-3 border-b text-center">Expected</th>
+          <th class="px-4 py-3 border-b text-center">Attended</th>
+          <th class="px-4 py-3 border-b text-center">Rate</th>
+          <th class="px-4 py-3 border-b">Missed Sessions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sid, r in report.items() %}
+        {% set pct = (r.attendance_rate * 100) | int %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 border-b font-medium">
+            {{ sid }}
+          </td>
+          <td class="px-4 py-3 border-b text-center">{{ r.sessions_expected }}</td>
+          <td class="px-4 py-3 border-b text-center">{{ r.sessions_attended }}</td>
+          <td class="px-4 py-3 border-b text-center">
+            <div class="flex items-center gap-2 justify-center">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div class="h-2 rounded-full
+                  {% if pct >= 75 %}bg-green-500
+                  {% elif pct >= 50 %}bg-yellow-400
+                  {% else %}bg-red-400{% endif %}"
+                  style="width: {{ pct }}%"></div>
+              </div>
+              <span class="text-xs font-mono w-10 text-right">{{ pct }}%</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 border-b text-gray-500 text-xs">
+            {{ r.missed_session_ids | join(", ") or "—" }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

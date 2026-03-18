@@ -18,6 +18,7 @@ repositories {
 dependencies {
     // JUnit 5 (Jupiter)
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
@@ -30,25 +31,5 @@ test {
     // Generate HTML test report
     reports {
         html.required = true
-        html.outputLocation = layout.buildDirectory.dir('reports/tests/test')
-    }
-
-    finalizedBy openTestReport
-}
-
-// Task to open HTML test report in browser
-task openTestReport {
-    doLast {
-        def reportFile = file('build/reports/tests/test/index.html')
-        if (reportFile.exists()) {
-            if (System.getProperty('os.name').toLowerCase().contains('win')) {
-                "cmd /c start ${reportFile.absolutePath}".execute()
-            } else if (System.getProperty('os.name').toLowerCase().contains('mac')) {
-                "open ${reportFile.absolutePath}".execute()
-            } else {
-                // Linux
-                "xdg-open ${reportFile.absolutePath}".execute()
-            }
-        }
     }
 }

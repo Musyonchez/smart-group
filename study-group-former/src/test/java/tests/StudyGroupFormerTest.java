@@ -15,7 +15,7 @@ public class StudyGroupFormerTest {
         List<Student> students = List.of(
             new Student("Perez", "AI", "Math", "Coding", List.of("Mon")),
             new Student("John", "AI", "Coding", "Math", List.of("Mon")),
-            new Student("Jane", "Cybersecurity", "Networking", "Crypto", List.of("Tue"))
+                new Student("Jane", "Cybersecurity", "Networking", "Crypto", List.of("Tue"))
         );
 
         List<List<Student>> groups = former.formGroups(students);

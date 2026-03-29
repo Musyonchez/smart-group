@@ -6,75 +6,101 @@
   <title>Smart Study Group Matching System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .tab-btn.active { @apply bg-indigo-600 text-white; }
+    .tab-btn.active {
+      background: #4f46e5;
+      color: white;
+      border-color: #4f46e5;
+    }
     .panel { display: none; }
     .panel.active { display: block; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-slate-100 min-h-screen text-gray-800 font-sans">
 
 <!-- Header -->
-<header class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow">
-  <div>
-    <h1 class="text-xl font-bold">Smart Study Group Matching System</h1>
-    <p class="text-indigo-200 text-sm">SWE3020 — Live Demo</p>
+<header class="bg-gradient-to-r from-indigo-700 to-indigo-500 text-white px-8 py-5 flex items-center justify-between shadow-lg">
+  <div class="flex items-center gap-4">
+    <div class="bg-white/20 rounded-xl p-2.5">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-5-4M9 20H4v-2a4 4 0 015-4m6 6v-2a4 4 0 00-3-3.87M9 14a4 4 0 01-3-3.87M15 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="text-xl font-bold tracking-tight">Smart Study Group Matching</h1>
+      <p class="text-indigo-200 text-xs mt-0.5">SWE3020 — Live Demo</p>
+    </div>
   </div>
   <form method="post" action="/demo/reset">
-    <button class="bg-indigo-500 hover:bg-indigo-400 text-sm px-3 py-1 rounded">
-      Reset Demo Data
+    <button class="bg-white/10 hover:bg-white/20 border border-white/30 text-sm px-4 py-2 rounded-lg transition font-medium">
+      Reset Demo
     </button>
   </form>
 </header>
 
 <!-- Flash message -->
 {% if msg %}
-<div class="bg-green-100 border border-green-300 text-green-800 text-sm px-6 py-2">
+<div class="mx-8 mt-4 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-5 py-3 rounded-xl shadow-sm">
+  <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+  </svg>
   {{ msg.replace("+", " ") }}
 </div>
 {% endif %}
 
 <!-- Tabs -->
-<div class="flex gap-1 px-6 pt-4">
+<div class="px-8 pt-6 flex gap-2">
   {% for tab in ["Students", "Match", "Sessions", "Schedule", "Reports"] %}
   <button onclick="showTab('{{ tab.lower() }}')"
           id="tab-{{ tab.lower() }}"
-          class="tab-btn px-4 py-2 rounded-t text-sm font-medium bg-white border border-b-0 border-gray-300 hover:bg-indigo-50">
+          class="tab-btn px-5 py-2.5 rounded-t-xl text-sm font-semibold border border-b-0 border-gray-200 bg-white text-gray-500 hover:text-indigo-600 transition-colors">
     {{ tab }}
   </button>
   {% endfor %}
 </div>
 
-<main class="px-6 pb-10">
+<main class="px-8 pb-12">
 
 <!-- ── STUDENTS ─────────────────────────────────────────────────────────── -->
-<div id="panel-students" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
-  <div class="flex gap-8">
+<div id="panel-students" class="panel bg-white rounded-b-2xl rounded-tr-2xl border border-gray-200 shadow-sm p-8">
+  <div class="flex gap-10">
 
     <!-- Add student form -->
     <div class="w-80 shrink-0">
-      <h2 class="font-semibold text-lg mb-3">Add Student</h2>
-      <form method="post" action="/students/add" class="space-y-3 text-sm">
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        <span class="bg-indigo-100 text-indigo-600 rounded-lg p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+        </span>
+        Add Student
+      </h2>
+      <form method="post" action="/students/add" class="space-y-4 text-sm">
         <div>
-          <label class="block text-gray-600 mb-1">ID</label>
-          <input name="sid" required class="border rounded w-full px-2 py-1" placeholder="e.g. S9"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Student ID</label>
+          <input name="sid" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="e.g. S9"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Name</label>
-          <input name="name" required class="border rounded w-full px-2 py-1" placeholder="Full name"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Full Name</label>
+          <input name="name" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="Jane Doe"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Courses <span class="text-gray-400">(comma-separated)</span></label>
-          <input name="courses" required class="border rounded w-full px-2 py-1" placeholder="COMP101, MATH201"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Courses <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+          <input name="courses" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="COMP101, MATH201"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Weak Topics <span class="text-gray-400">(optional)</span></label>
-          <input name="weak" class="border rounded w-full px-2 py-1" placeholder="Recursion, Graphs"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Weak Topics <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input name="weak" class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="Recursion, Graphs"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Available Slots <span class="text-gray-400">(DAY-HH:MM)</span></label>
-          <input name="slots" required class="border rounded w-full px-2 py-1" placeholder="MON-09:00, FRI-10:00"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Available Slots <span class="text-gray-400 font-normal">(DAY-HH:MM)</span></label>
+          <input name="slots" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="MON-09:00, FRI-10:00"/>
         </div>
-        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2.5 font-semibold transition shadow-sm shadow-indigo-200">
           Add Student
         </button>
       </form>
@@ -82,113 +108,149 @@
 
     <!-- Student list -->
     <div class="flex-1 overflow-auto">
-      <h2 class="font-semibold text-lg mb-3">All Students ({{ students|length }})</h2>
-      <table class="w-full text-sm border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="px-3 py-2 border">ID</th>
-            <th class="px-3 py-2 border">Name</th>
-            <th class="px-3 py-2 border">Courses</th>
-            <th class="px-3 py-2 border">Weak Topics</th>
-            <th class="px-3 py-2 border">Available Slots</th>
-            <th class="px-3 py-2 border"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for s in students %}
-          <tr class="hover:bg-gray-50">
-            <td class="px-3 py-1.5 border font-mono text-indigo-700">{{ s.id }}</td>
-            <td class="px-3 py-1.5 border font-medium">{{ s.name }}</td>
-            <td class="px-3 py-1.5 border text-gray-600">{{ s.courses | join(", ") }}</td>
-            <td class="px-3 py-1.5 border text-gray-500">{{ s.weak_topics | join(", ") or "—" }}</td>
-            <td class="px-3 py-1.5 border text-gray-500">{{ s.available_slots | join(", ") }}</td>
-            <td class="px-3 py-1.5 border text-center">
-              <form method="post" action="/students/delete" class="inline">
-                <input type="hidden" name="sid" value="{{ s.id }}"/>
-                <button class="text-red-500 hover:text-red-700 text-xs">remove</button>
-              </form>
-            </td>
-          </tr>
-          {% else %}
-          <tr><td colspan="6" class="px-3 py-4 text-gray-400 text-center">No students yet.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        All Students
+        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">{{ students|length }}</span>
+      </h2>
+      <div class="rounded-xl border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Courses</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Weak Topics</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slots</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {% for s in students %}
+            <tr class="hover:bg-indigo-50/40 transition-colors">
+              <td class="px-4 py-3 font-mono text-indigo-600 font-semibold">{{ s.id }}</td>
+              <td class="px-4 py-3 font-medium text-gray-800">{{ s.name }}</td>
+              <td class="px-4 py-3">
+                {% for c in s.courses %}
+                <span class="inline-block bg-indigo-50 text-indigo-700 text-xs rounded-md px-2 py-0.5 mr-1">{{ c }}</span>
+                {% endfor %}
+              </td>
+              <td class="px-4 py-3 text-gray-400 text-xs">{{ s.weak_topics | join(", ") or "—" }}</td>
+              <td class="px-4 py-3 text-gray-500 text-xs">{{ s.available_slots | join(", ") }}</td>
+              <td class="px-4 py-3 text-right">
+                <form method="post" action="/students/delete" class="inline">
+                  <input type="hidden" name="sid" value="{{ s.id }}"/>
+                  <button class="text-red-400 hover:text-red-600 text-xs font-medium transition">Remove</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="px-4 py-12 text-center">
+                <div class="text-gray-300 text-4xl mb-2">👤</div>
+                <p class="text-gray-400 text-sm">No students yet. Add one using the form.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ── MATCH ────────────────────────────────────────────────────────────── -->
-<div id="panel-match" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
-  <div class="flex gap-8">
+<div id="panel-match" class="panel bg-white rounded-b-2xl rounded-tr-2xl border border-gray-200 shadow-sm p-8">
+  <div class="flex gap-10">
 
     <div class="w-80 shrink-0">
-      <h2 class="font-semibold text-lg mb-3">Run Matching</h2>
-      <form method="post" action="/match" class="space-y-3 text-sm">
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        <span class="bg-indigo-100 text-indigo-600 rounded-lg p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </span>
+        Run Matching
+      </h2>
+      <form method="post" action="/match" class="space-y-4 text-sm">
         <div>
-          <label class="block text-gray-600 mb-1">Course</label>
-          <input name="course" required class="border rounded w-full px-2 py-1" placeholder="COMP101"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Course</label>
+          <input name="course" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="COMP101"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Time Slot <span class="text-gray-400">(DAY-HH:MM)</span></label>
-          <input name="slot" required class="border rounded w-full px-2 py-1" placeholder="MON-09:00"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Time Slot <span class="text-gray-400 font-normal">(DAY-HH:MM)</span></label>
+          <input name="slot" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="MON-09:00"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Group Size</label>
-          <input name="groupsize" type="number" min="2" max="5" value="3"
-                 class="border rounded w-full px-2 py-1"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Group Size</label>
+          <input name="groupsize" type="number" min="2" max="5" value="3" class="border border-gray-200 rounded-lg w-full px-3 py-2 transition"/>
         </div>
-        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2.5 font-semibold transition shadow-sm shadow-indigo-200">
           Match Students
         </button>
       </form>
       <form method="post" action="/match/reset" class="mt-3">
-        <button class="w-full border border-red-400 text-red-500 hover:bg-red-50 rounded py-1.5 text-sm">
+        <button class="w-full border border-red-200 text-red-400 hover:bg-red-50 hover:border-red-300 rounded-lg py-2.5 text-sm font-medium transition">
           Clear All Groups & Sessions
         </button>
       </form>
     </div>
 
     <div class="flex-1">
-      <h2 class="font-semibold text-lg mb-3">Formed Groups ({{ groups|length }})</h2>
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        Formed Groups
+        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">{{ groups|length }}</span>
+      </h2>
       {% if groups %}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for g in groups %}
-        <div class="border rounded p-4 bg-gray-50">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-mono font-bold text-indigo-700">{{ g.id }}</span>
-            <span class="text-xs bg-indigo-100 text-indigo-700 rounded px-2 py-0.5">{{ g.course }}</span>
-            <span class="text-xs text-gray-500">{{ g.time_slot }}</span>
+        <div class="border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all bg-gradient-to-br from-white to-indigo-50/40">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="font-mono font-bold text-indigo-700 text-sm">{{ g.id }}</span>
+            <span class="text-xs bg-indigo-100 text-indigo-700 rounded-full px-2.5 py-0.5 font-medium">{{ g.course }}</span>
+            <span class="text-xs text-gray-400 ml-auto">{{ g.time_slot }}</span>
           </div>
-          <ul class="text-sm text-gray-700 space-y-0.5">
+          <ul class="space-y-1.5 mb-4">
             {% for m in g.members %}
-            <li>• {{ m.name }} <span class="text-gray-400">({{ m.id }})</span></li>
+            <li class="flex items-center gap-2 text-sm">
+              <span class="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">{{ loop.index }}</span>
+              <span class="font-medium text-gray-700">{{ m.name }}</span>
+              <span class="text-gray-400 text-xs">({{ m.id }})</span>
+            </li>
             {% endfor %}
           </ul>
-          <a href="/report/group/{{ g.id }}"
-             class="mt-2 block text-xs text-indigo-600 hover:underline text-right">
-            View report →
+          <a href="/report/group/{{ g.id }}" class="block text-center text-xs text-indigo-600 hover:text-indigo-800 font-semibold border border-indigo-200 hover:border-indigo-400 rounded-lg py-1.5 transition">
+            View Report →
           </a>
         </div>
         {% endfor %}
       </div>
       {% else %}
-      <p class="text-gray-400 text-sm">No groups formed yet. Run matching above.</p>
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="text-5xl mb-3">🔍</div>
+        <p class="text-gray-400 text-sm">No groups formed yet.<br>Use the form to run matching.</p>
+      </div>
       {% endif %}
     </div>
   </div>
 </div>
 
 <!-- ── SESSIONS ─────────────────────────────────────────────────────────── -->
-<div id="panel-sessions" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
-  <div class="flex gap-8">
+<div id="panel-sessions" class="panel bg-white rounded-b-2xl rounded-tr-2xl border border-gray-200 shadow-sm p-8">
+  <div class="flex gap-10">
 
     <div class="w-80 shrink-0">
-      <h2 class="font-semibold text-lg mb-3">Record Session</h2>
-      <form method="post" action="/sessions/record" class="space-y-3 text-sm">
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        <span class="bg-indigo-100 text-indigo-600 rounded-lg p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </span>
+        Record Session
+      </h2>
+      <form method="post" action="/sessions/record" class="space-y-4 text-sm">
         <div>
-          <label class="block text-gray-600 mb-1">Group</label>
-          <select name="group_id" class="border rounded w-full px-2 py-1">
+          <label class="block text-gray-500 font-medium mb-1.5">Group</label>
+          <select name="group_id" class="border border-gray-200 rounded-lg w-full px-3 py-2 transition bg-white">
             {% for g in groups %}
             <option value="{{ g.id }}">{{ g.id }} — {{ g.course }} ({{ g.time_slot }})</option>
             {% else %}
@@ -197,93 +259,116 @@
           </select>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Date</label>
-          <input name="date" type="date" required class="border rounded w-full px-2 py-1"
-                 value="2026-03-10"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Date</label>
+          <input name="date" type="date" required class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" value="2026-03-10"/>
         </div>
         <div>
-          <label class="block text-gray-600 mb-1">Attendee IDs <span class="text-gray-400">(comma-separated)</span></label>
-          <input name="attendee_ids" class="border rounded w-full px-2 py-1" placeholder="S1, S2"/>
+          <label class="block text-gray-500 font-medium mb-1.5">Attendee IDs <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+          <input name="attendee_ids" class="border border-gray-200 rounded-lg w-full px-3 py-2 transition" placeholder="S1, S2"/>
         </div>
-        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1.5 font-medium">
+        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2.5 font-semibold transition shadow-sm shadow-indigo-200">
           Record Session
         </button>
       </form>
     </div>
 
     <div class="flex-1">
-      <h2 class="font-semibold text-lg mb-3">Recorded Sessions ({{ sessions|length }})</h2>
-      <table class="w-full text-sm border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="px-3 py-2 border">ID</th>
-            <th class="px-3 py-2 border">Group</th>
-            <th class="px-3 py-2 border">Date</th>
-            <th class="px-3 py-2 border">Attendees</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ses in sessions %}
-          <tr class="hover:bg-gray-50">
-            <td class="px-3 py-1.5 border font-mono text-indigo-700">{{ ses.id }}</td>
-            <td class="px-3 py-1.5 border">{{ ses.group.id }}</td>
-            <td class="px-3 py-1.5 border">{{ ses.date }}</td>
-            <td class="px-3 py-1.5 border text-gray-600">{{ ses.attendee_ids | join(", ") or "—" }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="4" class="px-3 py-4 text-gray-400 text-center">No sessions recorded yet.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <h2 class="font-bold text-gray-800 text-lg mb-5 flex items-center gap-2">
+        Recorded Sessions
+        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">{{ sessions|length }}</span>
+      </h2>
+      <div class="rounded-xl border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Session ID</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Group</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Attendees</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {% for ses in sessions %}
+            <tr class="hover:bg-indigo-50/40 transition-colors">
+              <td class="px-4 py-3 font-mono text-indigo-600 font-semibold">{{ ses.id }}</td>
+              <td class="px-4 py-3 font-medium text-gray-700">{{ ses.group.id }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ ses.date }}</td>
+              <td class="px-4 py-3 text-gray-400 text-xs">{{ ses.attendee_ids | join(", ") or "—" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4" class="px-4 py-12 text-center">
+                <div class="text-4xl mb-2">📋</div>
+                <p class="text-gray-400 text-sm">No sessions recorded yet.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ── SCHEDULE ──────────────────────────────────────────────────────────── -->
-<div id="panel-schedule" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
-  <h2 class="font-semibold text-lg mb-4">Weekly Meeting Schedule</h2>
+<div id="panel-schedule" class="panel bg-white rounded-b-2xl rounded-tr-2xl border border-gray-200 shadow-sm p-8">
+  <h2 class="font-bold text-gray-800 text-lg mb-6">Weekly Meeting Schedule</h2>
   {% if schedule %}
   {% set ns = namespace(current="") %}
   {% for e in schedule %}
     {% set header = e.day_label + " " + e.time %}
     {% if header != ns.current %}
       {% if ns.current %}</div>{% endif %}
-      <h3 class="font-medium text-indigo-700 mt-4 mb-2 border-b pb-1">{{ header }}</h3>
+      <h3 class="font-semibold text-indigo-700 mt-6 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 bg-indigo-500 rounded-full inline-block"></span>
+        {{ header }}
+      </h3>
       <div class="space-y-2">
       {% set ns.current = header %}
     {% endif %}
-    <div class="flex items-center gap-3 text-sm bg-gray-50 border rounded px-4 py-2">
+    <div class="flex items-center gap-4 text-sm bg-gradient-to-r from-indigo-50 to-white border border-indigo-100 rounded-xl px-5 py-3 hover:border-indigo-300 hover:shadow-sm transition-all">
       <span class="font-mono font-bold text-indigo-600 w-16">{{ e.group_id }}</span>
-      <span class="bg-indigo-100 text-indigo-700 text-xs rounded px-2 py-0.5">{{ e.course }}</span>
-      <span class="text-gray-600">{{ e.member_ids | join(", ") }}</span>
-      <a href="/report/group/{{ e.group_id }}" class="ml-auto text-xs text-indigo-500 hover:underline">report →</a>
+      <span class="bg-indigo-100 text-indigo-700 text-xs rounded-full px-3 py-0.5 font-medium">{{ e.course }}</span>
+      <span class="text-gray-500">{{ e.member_ids | join(", ") }}</span>
+      <a href="/report/group/{{ e.group_id }}" class="ml-auto text-xs text-indigo-500 hover:text-indigo-700 font-semibold transition">Report →</a>
     </div>
   {% endfor %}
   {% if schedule %}</div>{% endif %}
   {% else %}
-  <p class="text-gray-400 text-sm">No groups scheduled. Run matching first.</p>
+  <div class="flex flex-col items-center justify-center py-16 text-center">
+    <div class="text-5xl mb-3">🗓️</div>
+    <p class="text-gray-400 text-sm">No groups scheduled yet.<br>Run matching first to see the schedule.</p>
+  </div>
   {% endif %}
 </div>
 
 <!-- ── REPORTS ───────────────────────────────────────────────────────────── -->
-<div id="panel-reports" class="panel bg-white rounded-b rounded-tr border border-gray-300 p-6">
-  <h2 class="font-semibold text-lg mb-4">Group Reports</h2>
+<div id="panel-reports" class="panel bg-white rounded-b-2xl rounded-tr-2xl border border-gray-200 shadow-sm p-8">
+  <h2 class="font-bold text-gray-800 text-lg mb-6">Group Reports</h2>
   {% if groups %}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for g in groups %}
     <a href="/report/group/{{ g.id }}"
-       class="block border rounded p-4 hover:border-indigo-400 hover:shadow-sm transition">
-      <div class="flex items-center gap-2 mb-1">
+       class="block border border-gray-200 rounded-xl p-5 hover:border-indigo-400 hover:shadow-md transition-all bg-gradient-to-br from-white to-slate-50 group">
+      <div class="flex items-center gap-2 mb-2">
         <span class="font-mono font-bold text-indigo-700">{{ g.id }}</span>
-        <span class="text-xs bg-indigo-100 text-indigo-700 rounded px-2">{{ g.course }}</span>
+        <span class="text-xs bg-indigo-100 text-indigo-700 rounded-full px-2.5 py-0.5 font-medium">{{ g.course }}</span>
       </div>
-      <p class="text-sm text-gray-500">{{ g.time_slot }} · {{ g.members|length }} members</p>
-      <p class="text-xs text-indigo-500 mt-2">View attendance report →</p>
+      <p class="text-sm text-gray-500 mb-4">{{ g.time_slot }} · {{ g.members|length }} members</p>
+      <div class="flex items-center gap-1 text-xs text-indigo-500 group-hover:text-indigo-700 font-semibold transition">
+        View attendance report
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
     </a>
     {% endfor %}
   </div>
   {% else %}
-  <p class="text-gray-400 text-sm">No groups yet. Run matching first.</p>
+  <div class="flex flex-col items-center justify-center py-16 text-center">
+    <div class="text-5xl mb-3">📊</div>
+    <p class="text-gray-400 text-sm">No reports yet.<br>Run matching first to generate groups.</p>
+  </div>
   {% endif %}
 </div>
 
@@ -292,10 +377,9 @@
 <script>
   function showTab(name) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active','bg-indigo-600','text-white'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
-    const btn = document.getElementById('tab-' + name);
-    btn.classList.add('active','bg-indigo-600','text-white');
+    document.getElementById('tab-' + name).classList.add('active');
   }
   showTab('students');
 </script>

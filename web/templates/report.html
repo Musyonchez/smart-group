@@ -2,59 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Group Report — {{ group.id }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report — {{ group.id }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-slate-100 min-h-screen text-gray-800 font-sans">
 
-<header class="bg-indigo-700 text-white px-6 py-4 shadow flex items-center gap-4">
-  <a href="/" class="text-indigo-200 hover:text-white text-sm">← Back</a>
+<!-- Header -->
+<header class="bg-gradient-to-r from-indigo-700 to-indigo-500 text-white px-8 py-5 shadow-lg flex items-center gap-5">
+  <a href="/" class="bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg px-3 py-1.5 text-sm font-medium transition flex items-center gap-1">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back
+  </a>
   <div>
-    <h1 class="text-xl font-bold">Attendance Report — {{ group.id }}</h1>
-    <p class="text-indigo-200 text-sm">{{ group.course }} · {{ group.time_slot }}</p>
+    <h1 class="text-xl font-bold tracking-tight">Attendance Report — {{ group.id }}</h1>
+    <p class="text-indigo-200 text-xs mt-0.5">{{ group.course }} · {{ group.time_slot }}</p>
   </div>
 </header>
 
-<main class="px-6 py-8 max-w-3xl mx-auto">
-  <div class="bg-white border rounded-lg overflow-hidden shadow-sm">
-    <table class="w-full text-sm border-collapse">
+<main class="px-8 py-8 max-w-4xl mx-auto">
+
+  <!-- Summary cards -->
+  {% set total = report | length %}
+  {% set avg_pct = ((report.values() | map(attribute='attendance_rate') | sum) / total * 100) | int if total > 0 else 0 %}
+  {% set total_sessions = report.values() | map(attribute='sessions_expected') | first if total > 0 else 0 %}
+
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">Members</p>
+      <p class="text-3xl font-bold text-indigo-700">{{ total }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">Sessions</p>
+      <p class="text-3xl font-bold text-indigo-700">{{ total_sessions }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+      <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">Avg Attendance</p>
+      <p class="text-3xl font-bold
+        {% if avg_pct >= 75 %}text-emerald-600
+        {% elif avg_pct >= 50 %}text-yellow-500
+        {% else %}text-red-500{% endif %}">
+        {{ avg_pct }}%
+      </p>
+    </div>
+  </div>
+
+  <!-- Attendance table -->
+  <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800">Student Breakdown</h2>
+    </div>
+    <table class="w-full text-sm">
       <thead>
-        <tr class="bg-gray-100 text-left">
-          <th class="px-4 py-3 border-b">Student</th>
-          <th class="px-4 py-3 border-b text-center">Expected</th>
-          <th class="px-4 py-3 border-b text-center">Attended</th>
-          <th class="px-4 py-3 border-b text-center">Rate</th>
-          <th class="px-4 py-3 border-b">Missed Sessions</th>
+        <tr class="bg-gray-50 border-b border-gray-200">
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Expected</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Attended</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-48">Attendance Rate</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Missed</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-gray-100">
         {% for sid, r in report.items() %}
         {% set pct = (r.attendance_rate * 100) | int %}
-        <tr class="hover:bg-gray-50">
-          <td class="px-4 py-3 border-b font-medium">
-            {{ sid }}
-          </td>
-          <td class="px-4 py-3 border-b text-center">{{ r.sessions_expected }}</td>
-          <td class="px-4 py-3 border-b text-center">{{ r.sessions_attended }}</td>
-          <td class="px-4 py-3 border-b text-center">
-            <div class="flex items-center gap-2 justify-center">
-              <div class="w-24 bg-gray-200 rounded-full h-2">
-                <div class="h-2 rounded-full
-                  {% if pct >= 75 %}bg-green-500
+        <tr class="hover:bg-indigo-50/30 transition-colors">
+          <td class="px-6 py-4 font-semibold text-gray-800">{{ sid }}</td>
+          <td class="px-6 py-4 text-center text-gray-500">{{ r.sessions_expected }}</td>
+          <td class="px-6 py-4 text-center font-medium text-gray-700">{{ r.sessions_attended }}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-1 bg-gray-100 rounded-full h-2">
+                <div class="h-2 rounded-full transition-all
+                  {% if pct >= 75 %}bg-emerald-500
                   {% elif pct >= 50 %}bg-yellow-400
                   {% else %}bg-red-400{% endif %}"
-                  style="width: {{ pct }}%"></div>
+                  style="width: {{ pct }}%">
+                </div>
               </div>
-              <span class="text-xs font-mono w-10 text-right">{{ pct }}%</span>
+              <span class="text-xs font-bold w-10 text-right
+                {% if pct >= 75 %}text-emerald-600
+                {% elif pct >= 50 %}text-yellow-500
+                {% else %}text-red-500{% endif %}">
+                {{ pct }}%
+              </span>
             </div>
           </td>
-          <td class="px-4 py-3 border-b text-gray-500 text-xs">
-            {{ r.missed_session_ids | join(", ") or "—" }}
+          <td class="px-6 py-4 text-gray-400 text-xs">
+            {% if r.missed_session_ids %}
+              {% for s in r.missed_session_ids %}
+              <span class="inline-block bg-red-50 text-red-400 rounded px-1.5 py-0.5 mr-1">{{ s }}</span>
+              {% endfor %}
+            {% else %}
+              <span class="text-emerald-500 font-medium">None ✓</span>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    <!-- Legend -->
+    <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-6 text-xs text-gray-400">
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>≥ 75% Good</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-yellow-400 rounded-full inline-block"></span>≥ 50% Fair</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-red-400 rounded-full inline-block"></span>&lt; 50% At Risk</span>
+    </div>
   </div>
 </main>
 </body>
